@@ -70,7 +70,7 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 // SetupWithManager sets up the controller with the Manager.
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		//Named("machine").
+		Named("machine").
 		For(&finalizingv1.Machine{}).
 		Complete(r)
 }
