@@ -1,0 +1,85 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - finalizing.codefactory.hu
+  resources:
+  - machines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - finalizing.codefactory.hu
+  resources:
+  - machines/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - finalizing.codefactory.hu
+  resources:
+  - machines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicdeployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicdeployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicdeployments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicstatefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicstatefulsets/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicstatefulsets/status
+  verbs:
+  - get
+  - patch
+  - update

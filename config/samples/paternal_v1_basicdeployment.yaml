@@ -1,0 +1,6 @@
+apiVersion: paternal.codefactory.hu/v1
+kind: BasicDeployment
+metadata:
+  name: basicdeployment-sample
+spec:
+  # TODO(user): Add fields here

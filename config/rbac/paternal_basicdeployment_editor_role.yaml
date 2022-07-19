@@ -1,0 +1,24 @@
+# permissions for end users to edit basicdeployments.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: basicdeployment-editor-role
+rules:
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicdeployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicdeployments/status
+  verbs:
+  - get

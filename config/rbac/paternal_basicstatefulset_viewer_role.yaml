@@ -1,0 +1,20 @@
+# permissions for end users to view basicstatefulsets.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: basicstatefulset-viewer-role
+rules:
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicstatefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicstatefulsets/status
+  verbs:
+  - get

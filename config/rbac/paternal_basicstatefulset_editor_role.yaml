@@ -1,0 +1,24 @@
+# permissions for end users to edit basicstatefulsets.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: basicstatefulset-editor-role
+rules:
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicstatefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - paternal.codefactory.hu
+  resources:
+  - basicstatefulsets/status
+  verbs:
+  - get

@@ -1,0 +1,6 @@
+apiVersion: paternal.codefactory.hu/v1
+kind: BasicStatefulSet
+metadata:
+  name: basicstatefulset-sample
+spec:
+  # TODO(user): Add fields here

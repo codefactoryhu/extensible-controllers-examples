@@ -32,7 +32,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	finalizingv1 "github.com/codefactoryhu/extensible-controllers/apis/finalizing/v1"
+	paternalv1 "github.com/codefactoryhu/extensible-controllers/apis/paternal/v1"
 	finalizingcontrollers "github.com/codefactoryhu/extensible-controllers/controllers/finalizing"
+	paternalcontrollers "github.com/codefactoryhu/extensible-controllers/controllers/paternal"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -45,6 +47,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(finalizingv1.AddToScheme(scheme))
+	utilruntime.Must(paternalv1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -101,6 +104,20 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumesBackup")
+		os.Exit(1)
+	}
+	if err = (&paternalcontrollers.BasicDeploymentReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "BasicDeployment")
+		os.Exit(1)
+	}
+	if err = (&paternalcontrollers.BasicStatefulSetReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "BasicStatefulSet")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
