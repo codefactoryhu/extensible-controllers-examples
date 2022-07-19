@@ -1,0 +1,6 @@
+apiVersion: finalizing.codefactory.hu/v1
+kind: Machine
+metadata:
+  name: machine-sample
+spec:
+  # TODO(user): Add fields here

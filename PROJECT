@@ -1,0 +1,17 @@
+domain: codefactory.hu
+layout:
+- go.kubebuilder.io/v3
+multigroup: true
+projectName: extensible-controllers-examples-kubebuilder
+repo: github.com/codefactoryhu/extensible-controllers
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: codefactory.hu
+  group: finalizing
+  kind: Machine
+  path: github.com/codefactoryhu/extensible-controllers/apis/finalizing/v1
+  version: v1
+version: "3"
