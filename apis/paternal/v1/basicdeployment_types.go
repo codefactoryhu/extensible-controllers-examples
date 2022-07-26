@@ -29,7 +29,7 @@ type BasicDeploymentSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of BasicDeployment. Edit basicdeployment_types.go to remove/update
-	Replicas *int `json:"replicas"`
+	Replicas *int64 `json:"replicas"`
 }
 
 // BasicDeploymentStatus defines the observed state of BasicDeployment

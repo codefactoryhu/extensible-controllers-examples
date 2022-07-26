@@ -36,6 +36,9 @@ type BasicDeploymentReconciler struct {
 //+kubebuilder:rbac:groups=paternal.codefactory.hu,resources=basicdeployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=paternal.codefactory.hu,resources=basicdeployments/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=paternal.codefactory.hu,resources=basicdeployments/finalizers,verbs=update
+//+kubebuilder:rbac:groups=paternal.codefactory.hu,resources=basicreplicasets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=paternal.codefactory.hu,resources=basicreplicasets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=paternal.codefactory.hu,resources=basicreplicasets/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -47,9 +50,38 @@ type BasicDeploymentReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
 func (r *BasicDeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var basicDeployment paternalv1.BasicDeployment
+	if err := r.Get(ctx, req.NamespacedName, &basicDeployment); err != nil {
+		log.Error(err, "unable to fetch BasicDeployment")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	var childStatefulSets paternalv1.BasicReplicaSetList
+	if err := r.List(ctx, &childStatefulSets, client.InNamespace(req.Namespace), client.MatchingFields{jobOwnerKey: req.Name}); err != nil {
+		log.Error(err, "unable to list child ReplicaSets")
+		return ctrl.Result{}, err
+	}
+
+	var Ready bool
+
+	if len(childStatefulSets.Items) == 1 {
+		childStatefulSet := childStatefulSets.Items[0]
+		if childStatefulSet.Status.ActiveReplicas == childStatefulSet.Spec.ReplicaCount {
+			Ready = true
+		} else {
+			Ready = false
+		}
+	} else {
+		Ready = false
+	}
+
+	log.V(1).Info("BasicDeployment is ready", "Ready", Ready)
+	if err := r.Status().Update(ctx, &basicDeployment); err != nil {
+		log.Error(err, "unable to update BasicDeployment status")
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -59,6 +91,6 @@ func (r *BasicDeploymentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("basicdeployment").
 		For(&paternalv1.BasicDeployment{}).
-		Owns(&paternalv1.BasicStatefulSet{}).
+		Owns(&paternalv1.BasicReplicaSet{}).
 		Complete(r)
 }
