@@ -29,7 +29,7 @@ resources:
   controller: true
   domain: codefactory.hu
   group: paternal
-  kind: BasicStatefulSet
+  kind: BasicReplicaSet
   path: github.com/codefactoryhu/extensible-controllers/apis/paternal/v1
   version: v1
 version: "3"

@@ -1,20 +1,24 @@
-# permissions for end users to view basicstatefulsets.
+# permissions for end users to edit basicreplicasets.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: basicstatefulset-viewer-role
+  name: basicreplicaset-editor-role
 rules:
 - apiGroups:
   - paternal.codefactory.hu
   resources:
-  - basicstatefulsets
+  - basicreplicasets
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - paternal.codefactory.hu
   resources:
-  - basicstatefulsets/status
+  - basicreplicasets/status
   verbs:
   - get

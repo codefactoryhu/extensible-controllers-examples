@@ -47,9 +47,20 @@ type BasicReplicaSetReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
 func (r *BasicReplicaSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var basicReplicaSet paternalv1.BasicReplicaSet
+	if err := r.Get(ctx, req.NamespacedName, &basicReplicaSet); err != nil {
+		log.Error(err, "unable to fetch BasicReplicaSet")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	basicReplicaSet.Status.ActiveReplicas = basicReplicaSet.Spec.ReplicaCount
+
+	if err := r.Status().Update(ctx, &basicReplicaSet); err != nil {
+		log.Error(err, "unable to update BasicReplicaSet status")
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -57,7 +68,7 @@ func (r *BasicReplicaSetReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 // SetupWithManager sets up the controller with the Manager.
 func (r *BasicReplicaSetReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		Named("basicstatefulset").
+		Named("basicreplicaset").
 		For(&paternalv1.BasicReplicaSet{}).
 		Complete(r)
 }

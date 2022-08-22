@@ -29,7 +29,7 @@ type BasicReplicaSetSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of BasicReplicaSet. Edit basicreplicaset_types.go to remove/update
-	ReplicaCount *int64 `json:"replicaCount"`
+	ReplicaCount int64 `json:"replicaCount"`
 }
 
 // BasicReplicaSetStatus defines the observed state of BasicReplicaSet
@@ -38,7 +38,7 @@ type BasicReplicaSetStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	//+optional
-	ActiveReplicas *int64 `json:"activeReplicas,omitempty"`
+	ActiveReplicas int64 `json:"activeReplicas,omitempty"`
 }
 
 //+kubebuilder:object:root=true

@@ -29,7 +29,7 @@ type BasicDeploymentSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of BasicDeployment. Edit basicdeployment_types.go to remove/update
-	Replicas *int64 `json:"replicas"`
+	Replicas int64 `json:"replicas"`
 }
 
 // BasicDeploymentStatus defines the observed state of BasicDeployment
@@ -37,7 +37,7 @@ type BasicDeploymentStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	//+optional
-	Ready *bool `json:"ready,omitempty"`
+	Ready bool `json:"ready,omitempty"`
 }
 
 //+kubebuilder:object:root=true

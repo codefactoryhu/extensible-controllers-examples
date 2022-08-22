@@ -1,6 +1,6 @@
 apiVersion: paternal.codefactory.hu/v1
-kind: BasicStatefulSet
+kind: BasicReplicaSet
 metadata:
-  name: basicstatefulset-sample
+  name: basicreplicaset-sample
 spec:
   # TODO(user): Add fields here
