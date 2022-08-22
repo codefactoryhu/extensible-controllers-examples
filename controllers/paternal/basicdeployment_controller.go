@@ -111,23 +111,23 @@ func (r *BasicDeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 // SetupWithManager sets up the controller with the Manager.
 func (r *BasicDeploymentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
-	// if err := mgr.GetFieldIndexer().IndexField(context.Background(), &paternalv1.BasicReplicaSet{}, jobOwnerKey, func(rawObj client.Object) []string {
-	// 	// grab the replicaSet object, extract the owner...
-	// 	basicReplicaSet := rawObj.(*paternalv1.BasicReplicaSet)
-	// 	owner := v1.GetControllerOf(basicReplicaSet)
-	// 	if owner == nil {
-	// 		return nil
-	// 	}
-	// 	// ...make sure it's a BasicDeployment...
-	// 	if owner.APIVersion != apiGVStr || owner.Kind != "BasicDeployment" {
-	// 		return nil
-	// 	}
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &paternalv1.BasicReplicaSet{}, jobOwnerKey, func(rawObj client.Object) []string {
+		// grab the replicaSet object, extract the owner...
+		basicReplicaSet := rawObj.(*paternalv1.BasicReplicaSet)
+		owner := v1.GetControllerOf(basicReplicaSet)
+		if owner == nil {
+			return nil
+		}
+		// ...make sure it's a BasicDeployment...
+		if owner.APIVersion != apiGVStr || owner.Kind != "BasicDeployment" {
+			return nil
+		}
 
-	// 	// ...and if so, return it
-	// 	return []string{owner.Name}
-	// }); err != nil {
-	// 	return err
-	// }
+		// ...and if so, return it
+		return []string{owner.Name}
+	}); err != nil {
+		return err
+	}
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("basicdeployment").
 		For(&paternalv1.BasicDeployment{}).
