@@ -3,4 +3,4 @@ kind: BasicDeployment
 metadata:
   name: basicdeployment-sample
 spec:
-  # TODO(user): Add fields here
+  replicas: 4

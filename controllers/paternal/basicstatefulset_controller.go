@@ -19,6 +19,7 @@ package paternal
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,18 +48,23 @@ type BasicReplicaSetReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
 func (r *BasicReplicaSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx)
+	reqLogger := log.FromContext(ctx)
 
 	var basicReplicaSet paternalv1.BasicReplicaSet
-	if err := r.Get(ctx, req.NamespacedName, &basicReplicaSet); err != nil {
-		log.Error(err, "unable to fetch BasicReplicaSet")
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+	err := r.Get(ctx, req.NamespacedName, &basicReplicaSet)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			reqLogger.Info("BasicReplicaSet resource not found. Ignoring since object must be deleted.")
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		}
+		reqLogger.Error(err, "Failed to get BasicReplicaSet resource.")
+		return ctrl.Result{}, err
 	}
 
 	basicReplicaSet.Status.ActiveReplicas = basicReplicaSet.Spec.ReplicaCount
 
 	if err := r.Status().Update(ctx, &basicReplicaSet); err != nil {
-		log.Error(err, "unable to update BasicReplicaSet status")
+		reqLogger.Error(err, "unable to update BasicReplicaSet status")
 		return ctrl.Result{}, err
 	}
 

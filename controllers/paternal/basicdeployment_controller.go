@@ -19,6 +19,7 @@ package paternal
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -56,17 +57,22 @@ var (
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
 func (r *BasicDeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx)
+	reqLogger := log.FromContext(ctx)
 
 	var basicDeployment paternalv1.BasicDeployment
-	if err := r.Get(ctx, req.NamespacedName, &basicDeployment); err != nil {
-		log.Error(err, "unable to fetch BasicDeployment")
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+	err := r.Get(ctx, req.NamespacedName, &basicDeployment)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			reqLogger.Info("BasicDeployment resource not found. Ignoring since object must be deleted.")
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		}
+		reqLogger.Error(err, "Failed to get BasicDeployment resource.")
+		return ctrl.Result{}, err
 	}
 
 	var childReplicaSets paternalv1.BasicReplicaSetList
 	if err := r.List(ctx, &childReplicaSets, client.InNamespace(req.Namespace), client.MatchingFields{jobOwnerKey: req.Name}); err != nil {
-		log.Error(err, "unable to list child BasicReplicaSets")
+		reqLogger.Error(err, "unable to list child BasicReplicaSets")
 		return ctrl.Result{}, err
 	}
 
@@ -85,23 +91,23 @@ func (r *BasicDeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	basicDeployment.Status.Ready = Ready
 
-	log.V(1).Info("BasicDeployment is ready", "Ready", Ready)
+	reqLogger.V(1).Info("BasicDeployment is ready", "Ready", Ready)
 	if err := r.Status().Update(ctx, &basicDeployment); err != nil {
-		log.Error(err, "unable to update BasicDeployment status")
+		reqLogger.Error(err, "unable to update BasicDeployment status")
 		return ctrl.Result{}, err
 	}
 
 	if len(childReplicaSets.Items) == 0 {
 		basicReplicaSet, err := r.constructBasicReplicaSet(&basicDeployment)
 		if err != nil {
-			log.Error(err, "unable to construct BasicReplicaSet")
+			reqLogger.Error(err, "unable to construct BasicReplicaSet")
 			return ctrl.Result{}, err
 		}
 		if err := r.Create(ctx, basicReplicaSet); err != nil {
-			log.Error(err, "unable to create BasicReplicaSet")
+			reqLogger.Error(err, "unable to create BasicReplicaSet")
 			return ctrl.Result{}, err
 		}
-		log.V(1).Info("created Job for CronJob run", "BasicReplicaSet", basicReplicaSet.Name)
+		reqLogger.V(1).Info("created Job for CronJob run", "BasicReplicaSet", basicReplicaSet.Name)
 		return ctrl.Result{}, nil
 	}
 
